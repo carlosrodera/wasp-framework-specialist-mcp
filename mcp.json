@@ -1,0 +1,124 @@
+{
+  "name": "wasp-framework-specialist",
+  "version": "1.0.0",
+  "description": "Complete MCP for Wasp Framework development - Build SaaS applications with Wasp DSL and OpenSaaS template",
+  "author": "Carlos Rodera",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/carlosrodera/wasp-framework-specialist-mcp.git"
+  },
+  "capabilities": {
+    "commands": true,
+    "knowledge": true,
+    "code_generation": true,
+    "debugging": true,
+    "deployment": true
+  },
+  "commands": [
+    {
+      "name": "analizar_proyecto",
+      "description": "Analyze project requirements and suggest optimal Wasp architecture",
+      "parameters": ["description"]
+    },
+    {
+      "name": "generar_app",
+      "description": "Generate complete Wasp application ready for development",
+      "parameters": ["name", "template", "features"]
+    },
+    {
+      "name": "implementar_feature",
+      "description": "Add specific features to existing Wasp project",
+      "parameters": ["type", "specification"]
+    },
+    {
+      "name": "optimizar_performance",
+      "description": "Optimize performance and structure",
+      "parameters": ["area"]
+    },
+    {
+      "name": "debug_wasp",
+      "description": "Diagnose and solve common Wasp problems",
+      "parameters": ["error_description"]
+    },
+    {
+      "name": "deploy_app",
+      "description": "Deploy application to production",
+      "parameters": ["provider", "environment"]
+    },
+    {
+      "name": "test_app",
+      "description": "Generate and run complete test suite",
+      "parameters": ["type", "coverage"]
+    }
+  ],
+  "knowledge_base": {
+    "core_instructions": "knowledge/WASP_FRAMEWORK_SPECIALIST.md",
+    "command_definitions": "knowledge/commands.json",
+    "competency_matrix": "knowledge/competency_matrix.json",
+    "code_snippets": "knowledge/code_snippets.json",
+    "opensaas_features": "knowledge/opensaas_features.json",
+    "test_examples": "examples/test_suite.json"
+  },
+  "supported_frameworks": {
+    "wasp": "^0.17.0",
+    "opensaas": "latest",
+    "react": "^18.0.0",
+    "node": "^18.0.0",
+    "prisma": "^5.0.0"
+  },
+  "deployment_targets": [
+    "fly.io",
+    "railway",
+    "docker",
+    "kubernetes"
+  ],
+  "integrations": [
+    {
+      "name": "stripe",
+      "type": "payment",
+      "description": "Complete Stripe payment integration"
+    },
+    {
+      "name": "lemonsqueezy",
+      "type": "payment",
+      "description": "Lemon Squeezy payment integration"
+    },
+    {
+      "name": "sendgrid",
+      "type": "email",
+      "description": "SendGrid email service"
+    },
+    {
+      "name": "aws-s3",
+      "type": "storage",
+      "description": "AWS S3 file storage"
+    },
+    {
+      "name": "openai",
+      "type": "ai",
+      "description": "OpenAI GPT integration"
+    }
+  ],
+  "metrics": {
+    "saas_mvp_time": "2-4 hours",
+    "feature_development": "30-60 minutes",
+    "bug_fix": "10-15 minutes",
+    "deployment": "5 minutes",
+    "bundle_size_target": "< 500KB",
+    "api_response_target": "< 200ms p95",
+    "database_query_target": "< 100ms average"
+  },
+  "tags": [
+    "wasp",
+    "full-stack",
+    "saas",
+    "react",
+    "nodejs",
+    "prisma",
+    "opensaas",
+    "deployment",
+    "testing",
+    "ai-integration"
+  ]
+}
