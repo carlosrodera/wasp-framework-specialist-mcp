@@ -1,0 +1,123 @@
+{
+  "wasp_specialist_commands": {
+    "command_definitions": [
+      {
+        "command": "/analizar_proyecto",
+        "syntax": "/analizar_proyecto [descripción_detallada]",
+        "purpose": "Analiza requisitos de proyecto y sugiere arquitectura Wasp óptima",
+        "parameters": [
+          {
+            "name": "descripción_detallada",
+            "type": "string",
+            "required": true,
+            "description": "Descripción completa del proyecto: funcionalidades, usuarios, monetización"
+          }
+        ],
+        "process": [
+          "1. Evaluar complejidad técnica y de negocio",
+          "2. Determinar si usar Wasp vanilla, OpenSaaS template o híbrido",
+          "3. Identificar entidades principales y relaciones",
+          "4. Definir sistema de auth y roles necesarios",
+          "5. Sugerir integraciones de servicios externos",
+          "6. Proponer estructura de deployment"
+        ],
+        "output_format": {
+          "arquitectura_recomendada": "string",
+          "template_base": "wasp | opensaas | custom",
+          "entidades_principales": ["entity1", "entity2"],
+          "auth_strategy": "email | oauth | hybrid",
+          "servicios_externos": ["stripe", "sendgrid", "s3"],
+          "estimacion_tiempo": "hours",
+          "main_wasp_skeleton": "código .wasp básico"
+        },
+        "examples": [
+          "/analizar_proyecto Marketplace de cursos online con subscripciones, múltiples instructores, pagos, certificados",
+          "/analizar_proyecto App de productividad personal con IA, sync cross-device, freemium model"
+        ]
+      },
+      
+      {
+        "command": "/generar_app",
+        "syntax": "/generar_app [nombre] [template] [features...]",
+        "purpose": "Genera aplicación Wasp completa lista para desarrollo",
+        "parameters": [
+          {
+            "name": "nombre",
+            "type": "string",
+            "required": true,
+            "description": "Nombre de la aplicación (formato kebab-case)"
+          },
+          {
+            "name": "template",
+            "type": "enum",
+            "values": ["basic", "saas", "opensaas", "custom"],
+            "required": true,
+            "description": "Template base a utilizar"
+          },
+          {
+            "name": "features",
+            "type": "array",
+            "required": false,
+            "description": "Features adicionales: auth-oauth, payments-stripe, file-upload, ai-integration"
+          }
+        ],
+        "process": [
+          "1. Crear estructura base con wasp new o template",
+          "2. Configurar main.wasp con entidades necesarias",
+          "3. Generar esquema Prisma optimizado",
+          "4. Crear componentes React base con TailwindCSS",
+          "5. Implementar lógica de servidor con validaciones",
+          "6. Configurar variables de entorno template",
+          "7. Crear documentación README específica"
+        ],
+        "generated_files": [
+          "main.wasp",
+          "schema.prisma",
+          "src/client/Main.jsx",
+          "src/client/components/",
+          "src/server/actions.js",
+          "src/server/queries.js",
+          ".env.server.example",
+          ".env.client.example",
+          "README.md"
+        ],
+        "validation_steps": [
+          "wasp db migrate-dev ejecuta sin errores",
+          "wasp start funciona correctamente",
+          "Auth flow completo operativo",
+          "CRUD básico funcional"
+        ]
+      }
+    ],
+    
+    "command_aliases": {
+      "/quick_saas": "/generar_app quick-saas opensaas auth-oauth,payments-stripe",
+      "/debug": "/debug_wasp",
+      "/deploy": "/deploy_app fly production",
+      "/test": "/test_app full 80",
+      "/perf": "/optimizar_performance full_audit"
+    },
+    
+    "workflow_examples": [
+      {
+        "name": "Complete SaaS in 4 hours",
+        "commands": [
+          "/analizar_proyecto SaaS de gestión de proyectos con teams, facturación mensual",
+          "/generar_app project-manager opensaas auth-oauth,payments-stripe,file-upload",
+          "/implementar_feature crud_entity {\"name\": \"Project\", \"fields\": [\"name\", \"description\", \"status\"]}",
+          "/test_app integration 85",
+          "/deploy_app fly production"
+        ]
+      },
+      {
+        "name": "Debug and optimize existing app",
+        "commands": [
+          "/debug_wasp Database queries very slow, users complaining",
+          "/optimizar_performance database",
+          "/test_app unit 90",
+          "/deploy_app railway staging"
+        ]
+      }
+    ]
+  }
+}

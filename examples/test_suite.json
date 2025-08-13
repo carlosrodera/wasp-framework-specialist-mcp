@@ -1,0 +1,45 @@
+{
+  "wasp_test_suite": {
+    "test_categories": {
+      "unit_tests": {
+        "description": "Tests unitarios para lógica de servidor y utilidades",
+        "framework": "Vitest",
+        "location": "src/**/*.test.js",
+        "examples": [
+          {
+            "file": "src/server/queries.test.js",
+            "content": "import { expect, test, beforeEach } from 'vitest'\nimport { getUserTasks } from './queries.js'\nimport { mockContext, mockUser, mockTasks } from '../test/mocks.js'\n\ntest('getUserTasks returns only user tasks', async () => {\n  const context = mockContext({\n    user: mockUser({ id: 1 }),\n    entities: {\n      Task: {\n        findMany: vi.fn().mockResolvedValue(mockTasks([{ userId: 1 }]))\n      }\n    }\n  })\n  \n  const result = await getUserTasks({}, context)\n  \n  expect(result).toHaveLength(1)\n  expect(result[0].userId).toBe(1)\n  expect(context.entities.Task.findMany).toHaveBeenCalledWith({\n    where: { userId: 1 },\n    orderBy: { createdAt: 'desc' }\n  })\n})\n\ntest('getUserTasks throws 401 for unauthenticated user', async () => {\n  const context = mockContext({ user: null })\n  \n  await expect(getUserTasks({}, context)).rejects.toThrow('401')\n})"
+          },
+          {
+            "file": "src/server/actions.test.js", 
+            "content": "import { expect, test } from 'vitest'\nimport { createTask } from './actions.js'\nimport { mockContext, mockUser } from '../test/mocks.js'\n\ntest('createTask validates required fields', async () => {\n  const context = mockContext({ user: mockUser({ id: 1 }) })\n  \n  await expect(createTask({ title: '' }, context))\n    .rejects.toThrow('Title must be at least 3 characters')\n    \n  await expect(createTask({ title: 'ab' }, context))\n    .rejects.toThrow('Title must be at least 3 characters')\n})\n\ntest('createTask creates task with valid input', async () => {\n  const mockCreate = vi.fn().mockResolvedValue({ id: 1, title: 'Test Task', userId: 1 })\n  const context = mockContext({\n    user: mockUser({ id: 1 }),\n    entities: { Task: { create: mockCreate } }\n  })\n  \n  const result = await createTask({ title: 'Test Task', description: 'Test' }, context)\n  \n  expect(result.title).toBe('Test Task')\n  expect(mockCreate).toHaveBeenCalledWith({\n    data: {\n      title: 'Test Task',\n      description: 'Test',\n      userId: 1\n    }\n  })\n})"
+          }
+        ]
+      },
+      
+      "integration_tests": {
+        "description": "Tests de integración para APIs y database operations",
+        "framework": "Vitest + Supertest",
+        "setup": "Test database + fixtures",
+        "examples": [
+          {
+            "file": "src/server/integration/auth.test.js",
+            "content": "import { expect, test, beforeEach, afterEach } from 'vitest'\nimport request from 'supertest'\nimport { testApp, resetTestDb } from '../test/setup.js'\n\nbeforeEach(async () => {\n  await resetTestDb()\n})\n\ntest('POST /auth/signup creates new user', async () => {\n  const response = await request(testApp)\n    .post('/auth/signup')\n    .send({\n      email: 'test@example.com',\n      password: 'securePassword123'\n    })\n    .expect(201)\n    \n  expect(response.body.user.email).toBe('test@example.com')\n  expect(response.body.user.isEmailVerified).toBe(false)\n  expect(response.body).toHaveProperty('sessionId')\n})"
+          }
+        ]
+      },
+      
+      "e2e_tests": {
+        "description": "Tests end-to-end de flujos completos de usuario",
+        "framework": "Playwright",
+        "location": "e2e/",
+        "examples": [
+          {
+            "file": "e2e/auth-flow.spec.js",
+            "content": "import { test, expect } from '@playwright/test'\n\ntest.describe('Authentication Flow', () => {\n  test('complete signup and login flow', async ({ page }) => {\n    // Navigate to signup\n    await page.goto('http://localhost:3000/signup')\n    \n    // Fill signup form\n    await page.fill('[data-testid=\"email-input\"]', 'test@example.com')\n    await page.fill('[data-testid=\"password-input\"]', 'securePassword123')\n    await page.click('[data-testid=\"signup-button\"]')\n    \n    // Should show email verification message\n    await expect(page.locator('[data-testid=\"verification-message\"]')).toBeVisible()\n    await expect(page.locator('[data-testid=\"verification-message\"]'))\n      .toContainText('Please check your email')\n    \n    // Should be redirected to dashboard\n    await expect(page).toHaveURL(/.*\\/dashboard/)\n    await expect(page.locator('[data-testid=\"user-greeting\"]')).toBeVisible()\n  })\n})"
+          }
+        ]
+      }
+    }
+  }
+}

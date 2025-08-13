@@ -1,0 +1,30 @@
+{
+  "wasp_code_snippets": {
+    "basic_app_structure": {
+      "name": "Estructura básica de aplicación Wasp",
+      "language": "wasp",
+      "description": "Template mínimo para una aplicación Wasp funcional",
+      "code": "app MyApp {\n  wasp: { version: \"^0.17.0\" },\n  title: \"My Application\",\n  head: [\n    \"<meta name='description' content='My awesome app' />\"\n  ],\n  auth: {\n    userEntity: User,\n    methods: {\n      email: {\n        fromField: {\n          name: \"My App\",\n          email: \"noreply@myapp.com\"\n        }\n      }\n    }\n  }\n}\n\nroute RootRoute { path: \"/\", to: MainPage }\npage MainPage {\n  authRequired: true,\n  component: import Main from \"@client/Main.jsx\"\n}\n\nentity User {=psl\n  id          Int     @id @default(autoincrement())\n  email       String  @unique\n  password    String?\n  isEmailVerified Boolean @default(false)\n  emailVerificationSentAt DateTime?\n  passwordResetSentAt DateTime?\n  createdAt   DateTime @default(now())\npsl=}",
+      "dependencies": ["prisma", "react"],
+      "run_instructions": "1. Crear archivo main.wasp con este contenido\n2. Crear componente Main.jsx en src/client/\n3. Ejecutar 'wasp db migrate-dev' para crear la BD\n4. Ejecutar 'wasp start' para iniciar la aplicación"
+    },
+    
+    "complete_auth_setup": {
+      "name": "Configuración completa de autenticación",
+      "language": "wasp",
+      "description": "Auth con email, OAuth y configuración de email sender",
+      "code": "app MySaaS {\n  wasp: { version: \"^0.17.0\" },\n  title: \"My SaaS App\",\n  auth: {\n    userEntity: User,\n    methods: {\n      email: {\n        allowUnverifiedLogin: false,\n        fromField: {\n          name: \"My SaaS\",\n          email: \"auth@mysaas.com\"\n        },\n        emailVerification: {\n          getEmailContentFn: import { getVerificationEmailContent } from \"@server/auth/email.js\",\n          clientRoute: EmailVerificationRoute\n        },\n        passwordReset: {\n          getEmailContentFn: import { getPasswordResetEmailContent } from \"@server/auth/email.js\",\n          clientRoute: PasswordResetRoute\n        }\n      },\n      google: {\n        configFn: import { googleAuthConfig } from \"@server/auth/google.js\",\n        getUserFieldsFn: import { getGoogleUserFields } from \"@server/auth/google.js\"\n      },\n      gitHub: {\n        configFn: import { gitHubAuthConfig } from \"@server/auth/github.js\",\n        getUserFieldsFn: import { getGitHubUserFields } from \"@server/auth/github.js\"\n      }\n    },\n    onAuthFailedRedirectTo: \"/login\",\n    onAuthSucceededRedirectTo: \"/dashboard\"\n  },\n  emailSender: {\n    provider: SendGrid,\n    defaultFrom: {\n      name: \"My SaaS\",\n      email: \"noreply@mysaas.com\"\n    }\n  }\n}",
+      "dependencies": ["sendgrid", "oauth"],
+      "run_instructions": "1. Configurar variables: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SENDGRID_API_KEY\n2. Implementar funciones de configuración OAuth en servidor\n3. Crear páginas de verificación y reset de password"
+    },
+
+    "crud_operations": {
+      "name": "Operaciones CRUD automáticas",
+      "language": "wasp",
+      "description": "CRUD completo generado automáticamente para entidad",
+      "code": "entity Task {=psl\n  id          Int     @id @default(autoincrement())\n  title       String\n  description String?\n  completed   Boolean @default(false)\n  priority    String  @default(\"medium\")\n  userId      Int\n  user        User    @relation(fields: [userId], references: [id])\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\npsl=}\n\ncrud Tasks {\n  entity: Task,\n  operations: {\n    create: {\n      isPublic: false\n    },\n    get: {\n      isPublic: false\n    },\n    getAll: {\n      isPublic: false\n    },\n    update: {\n      isPublic: false\n    },\n    delete: {\n      isPublic: false\n    }\n  }\n}",
+      "dependencies": ["prisma"],
+      "run_instructions": "1. Las operaciones CRUD se generan automáticamente\n2. Importar en cliente: import { Tasks } from 'wasp/client/crud'\n3. Usar: await Tasks.create.submit({title: 'Nueva tarea', userId: user.id})"
+    }
+  }
+}

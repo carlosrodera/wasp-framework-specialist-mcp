@@ -1,0 +1,118 @@
+{
+  "wasp_competency_matrix": {
+    "assessment_levels": {
+      "B": "Básico - Puede realizar tareas con supervisión",
+      "M": "Intermedio - Puede trabajar independientemente",
+      "A": "Avanzado - Puede enseñar y optimizar",
+      "E": "Experto - Puede innovar y solucionar problemas complejos"
+    },
+    
+    "core_competencies": [
+      {
+        "category": "Fundamentos Wasp",
+        "skills": [
+          {
+            "skill": "Instalación y configuración inicial",
+            "level": "B",
+            "description": "Instalar CLI de Wasp, configurar entorno Node.js, crear primer proyecto",
+            "validation_criteria": [
+              "Ejecuta wasp new proyecto exitosamente",
+              "Configura variables de entorno básicas",
+              "Inicia aplicación con wasp start"
+            ],
+            "time_to_competency": "30 minutos",
+            "resources": ["https://wasp.sh/docs/quick-start"]
+          },
+          {
+            "skill": "Sintaxis .wasp fundamental",
+            "level": "M",
+            "description": "Dominar declaraciones básicas: app, page, route, entity",
+            "validation_criteria": [
+              "Crea main.wasp funcional con múltiples páginas",
+              "Define entidades con relaciones",
+              "Configura rutas y navegación"
+            ],
+            "time_to_competency": "2 horas",
+            "resources": ["https://wasp.sh/docs/general/language"]
+          }
+        ]
+      },
+      
+      {
+        "category": "Gestión de Datos",
+        "skills": [
+          {
+            "skill": "Modelado de entidades Prisma",
+            "level": "M",
+            "description": "Diseñar esquemas de BD complejos con relaciones",
+            "validation_criteria": [
+              "Crea modelos con relaciones 1:N y N:N",
+              "Implementa índices y constraints",
+              "Maneja migraciones sin pérdida de datos"
+            ],
+            "time_to_competency": "4 horas",
+            "resources": ["https://wasp.sh/docs/data-model/entities"]
+          }
+        ]
+      },
+      
+      {
+        "category": "Autenticación y Seguridad",
+        "skills": [
+          {
+            "skill": "Auth básico email/password",
+            "level": "B",
+            "description": "Implementar sistema de login básico",
+            "validation_criteria": [
+              "Configura auth con verificación email",
+              "Implementa páginas login/signup",
+              "Protege rutas con authRequired"
+            ],
+            "time_to_competency": "2 horas",
+            "resources": ["https://wasp.sh/docs/auth/email"]
+          }
+        ]
+      }
+    ],
+    
+    "use_case_scenarios": [
+      {
+        "name": "SaaS MVP en 4 horas",
+        "description": "Construir SaaS funcional desde cero en una tarde",
+        "required_skills": ["B: Instalación", "M: Sintaxis .wasp", "M: Auth básico", "M: Pagos Stripe", "B: Deploy Fly.io"],
+        "deliverables": [
+          "Aplicación con auth completa",
+          "Sistema de suscripciones básico",
+          "3-5 páginas principales",
+          "Deploy en producción funcionando"
+        ],
+        "success_metrics": [
+          "Usuario puede registrarse y pagar",
+          "Admin puede ver métricas básicas",
+          "Aplicación accesible públicamente"
+        ]
+      }
+    ],
+    
+    "learning_paths": [
+      {
+        "path": "Beginner to Production",
+        "duration": "2 semanas intensivas",
+        "stages": [
+          {
+            "week": 1,
+            "focus": "Fundamentos",
+            "skills": ["Instalación", "Sintaxis .wasp", "Modelado básico", "Auth básico"],
+            "project": "Todo app con auth"
+          },
+          {
+            "week": 2,
+            "focus": "Integración",
+            "skills": ["Pagos", "Email", "Testing", "Deploy"],
+            "project": "SaaS MVP completo"
+          }
+        ]
+      }
+    ]
+  }
+}

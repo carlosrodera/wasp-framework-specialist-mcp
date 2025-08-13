@@ -1,0 +1,31 @@
+{
+  "opensaas_template_features": {
+    "authentication_complete": {
+      "name": "Sistema de autenticación completo OpenSaaS",
+      "description": "Implementación completa con email verification, OAuth y password reset",
+      "wasp_config": "auth: {\n  userEntity: User,\n  methods: {\n    email: {\n      allowUnverifiedLogin: false,\n      fromField: {\n        name: \"OpenSaaS\",\n        email: \"noreply@opensaas.sh\"\n      },\n      emailVerification: {\n        getEmailContentFn: import { getVerificationEmailContent } from \"@server/auth/email.js\",\n        clientRoute: EmailVerificationRoute\n      },\n      passwordReset: {\n        getEmailContentFn: import { getPasswordResetEmailContent } from \"@server/auth/email.js\",\n        clientRoute: PasswordResetRoute\n      }\n    },\n    google: {\n      configFn: import { googleAuthConfig } from \"@server/auth/google.js\",\n      getUserFieldsFn: import { getGoogleUserFields } from \"@server/auth/google.js\"\n    },\n    gitHub: {\n      configFn: import { gitHubAuthConfig } from \"@server/auth/github.js\",\n      getUserFieldsFn: import { getGitHubUserFields } from \"@server/auth/github.js\"\n    }\n  },\n  onAuthFailedRedirectTo: \"/login\",\n  onAuthSucceededRedirectTo: \"/demo-app\"\n}",
+      "features": [
+        "Email verification obligatoria",
+        "Password reset con tokens seguros",
+        "OAuth con Google y GitHub",
+        "Manejo de usuarios no verificados",
+        "Redirect personalizado post-auth"
+      ],
+      "setup_steps": [
+        "Configurar variables OAuth en .env.server",
+        "Implementar funciones de configuración OAuth",
+        "Crear páginas de verificación y reset",
+        "Configurar SendGrid para emails"
+      ]
+    },
+
+    "payments_stripe_lemon": {
+      "name": "Pagos duales: Stripe + Lemon Squeezy",
+      "description": "Sistema de pagos con dos proveedores para máxima flexibilidad",
+      "entities": "entity User {=psl\n  id                        Int                 @id @default(autoincrement())\n  email                     String              @unique\n  username                  String?             @unique\n  createdAt                 DateTime            @default(now())\n  lastActiveTimestamp       DateTime            @default(now())\n  isAdmin                   Boolean             @default(false)\n  stripeId                  String?             @unique\n  lemonSqueezyCustomerId    String?             @unique\n  checkoutSessionId         String?\n  subscriptions             Subscription[]\n  orders                    Order[]\npsl=}",
+      "stripe_implementation": "// Stripe checkout\nexport const createStripeCheckoutSession = async ({ priceId }, context) => {\n  if (!context.user) throw new HttpError(401)\n  \n  const session = await stripe.checkout.sessions.create({\n    customer_email: context.user.email,\n    line_items: [{ price: priceId, quantity: 1 }],\n    mode: 'subscription',\n    success_url: `${process.env.WASP_WEB_CLIENT_URL}/checkout?success=true`,\n    cancel_url: `${process.env.WASP_WEB_CLIENT_URL}/pricing`\n  })\n  \n  await context.entities.User.update({\n    where: { id: context.user.id },\n    data: { checkoutSessionId: session.id }\n  })\n  \n  return { sessionUrl: session.url }\n}",
+      "lemon_implementation": "// Lemon Squeezy checkout\nexport const createLemonSqueezyCheckout = async ({ variantId }, context) => {\n  if (!context.user) throw new HttpError(401)\n  \n  const checkout = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {\n    method: 'POST',\n    headers: {\n      'Authorization': `Bearer ${process.env.LEMON_SQUEEZY_API_KEY}`,\n      'Content-Type': 'application/vnd.api+json'\n    },\n    body: JSON.stringify({\n      data: {\n        type: 'checkouts',\n        attributes: {\n          checkout_data: {\n            email: context.user.email,\n            custom: { user_id: context.user.id }\n          }\n        },\n        relationships: {\n          store: { data: { type: 'stores', id: process.env.LEMON_SQUEEZY_STORE_ID } },\n          variant: { data: { type: 'variants', id: variantId } }\n        }\n      }\n    })\n  })\n  \n  const response = await checkout.json()\n  return { checkoutUrl: response.data.attributes.url }\n}",
+      "webhook_handlers": "// Manejo unificado de webhooks\nexport const handlePaymentWebhook = async (event, context) => {\n  const { provider, eventType, data } = event\n  \n  switch (provider) {\n    case 'stripe':\n      return handleStripeWebhook(eventType, data, context)\n    case 'lemonsqueezy':\n      return handleLemonSqueezyWebhook(eventType, data, context)\n    default:\n      throw new HttpError(400, 'Unknown payment provider')\n  }\n}"
+    }
+  }
+}
